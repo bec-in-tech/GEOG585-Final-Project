@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Botanical Collection Points of Southern Nevada</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css"
+      type="text/css"
+      crossorigin=""
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js"
+      crossorigin=""
+    ></script>
+    
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
+    
+    <script src="boundaries.js"></script>
+    <script src="collectionpoints.js"></script>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+
+    <style>
+      #title {
+        font-family: Arial, sans-serif;
+        font-size: 26px;
+      }
+
+      #summaryLabel {
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+      }
+
+    </style>
+
+    <script type="text/javascript">
+      var map;
+      var boundaryLayer;
+      var collectionPointLayer;
+      var selection;
+      var selectedLayer;
+
+      function init() {
+        // Create map and set center and zoom level
+        map = new L.map("mapid");
+        map.setView([36.1699, -115.1398], 9);
+
+        // Create OpenStreetMap light terrain layer
+        var osmLightTerrain = L.tileLayer(
+          "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+          {
+            attribution: "© OpenStreetMap contributors - Light Terrain",
+          }
+        );
+
+        // Add default layer to map
+        osmLightTerrain.addTo(map);
+
+        // Create OpenStreetMap Topography Layer
+        var osmTopography = L.tileLayer(
+          "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          {
+            attribution: "© OpenStreetMap contributors - Topography",
+          }
+        );
+
+        // Create OSM tile layer
+        var osm = L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            maxZoom: 19,
+            attribution: "© OpenStreetMap contributors - Open Street Map",
+          }
+        );
+
+        // Create a layer group to hold the basemap layer
+        var baseLayers = {
+          "Light Terrain": osmLightTerrain,
+          "Topography": osmTopography,
+          "OSM": osm,
+        };
+
+        // Add a scale bar to the map
+         L.control.scale().addTo(map);
+
+        // Define the styles for the boundary layer (unselected and selected)
+        function boundaryStyle(feature) {
+          // Assign a different color for each NAME property
+          var nameColors = {
+            "Bureau of Indian Affairs": "#e4b300",
+            "Bureau of Land Management": "#fff79d",
+            "Bureau of Reclamation": "#b15923",
+            "City of Las Vegas": "#001aff",
+            "Clark County, NV": "#439be9",
+            "Department of Defense": "#e74873",
+            "Department of Energy": "#680000",
+            "Fish and Wildlife Service": "#004e1d",
+            "Forest Service": "#72d47f",
+            "National Park Service": "#7567cf",
+            "Nevada State": "#6784d5",
+            "Private": "#c6c6c6",
+          };
+
+          var name = feature.properties.NAME;
+          var fillColor = nameColors[name] || "#CCCCCC"; // Assign a color for Unknown boundaries
+
+          return {
+            fillColor: fillColor,
+            fillOpacity: 0.3,
+            color: "transparent", // Apply transparent stroke color
+          };
+        }
+
+        function boundarySelectedStyle(feature) {
+          return {
+            fillColor: "#00BFFF",
+            fillOpacity: 0.8,
+            color: "#157DEC",
+          };
+        }
+
+        // Handle click events on boundary features
+        function boundaryOnEachFeature(feature, layer) {
+          layer.on({
+            click: function (e) {
+              if (selection) {
+                resetStyles();
+              }
+
+              e.target.setStyle(boundarySelectedStyle());
+              selection = e.target;
+              selectedLayer = boundaryLayer;
+
+              // Insert some HTML with the feature name
+              buildSummaryLabelForBoundary(feature);
+
+              L.DomEvent.stopPropagation(e); // stop click event from being propagated further
+            },
+          });
+        }
+
+        // Add the boundary GeoJSON layer using the boundaryData variable from boundaries.js
+        boundaryLayer = new L.geoJSON(boundaryData, {
+          style: boundaryStyle,
+          onEachFeature: boundaryOnEachFeature,
+        });
+
+        boundaryLayer.addTo(map);
+
+        // Create icons for botanical collection points (selected and unselected)
+        var collectionPointIcon = L.icon({
+          iconUrl: "flower.svg",
+          iconSize: [18, 18],
+        });
+
+        var selectedCollectionPointIcon = L.icon({
+          iconUrl: "flower_selected.svg",
+          iconSize: [19, 19],
+        });
+
+        // Handle click events on collection point features
+        function collectionPointOnEachFeature(feature, layer) {
+          layer.on({
+            click: function (e) {
+              if (selection) {
+                resetStyles();
+              }
+
+              e.target.setIcon(selectedCollectionPointIcon); // Change to selected icon
+              selection = e.target;
+              selectedLayer = collectionPointLayer;
+
+              // Insert some HTML with the feature name
+              buildSummaryLabelForCollectionPoint(feature);
+
+              L.DomEvent.stopPropagation(e); // stop click event from being propagated further
+            },
+          });
+        }
+
+        // Handle clicks on the map that didn't hit a feature
+        map.addEventListener("click", function (e) {
+          if (selection) {
+            resetStyles();
+            selection = null;
+            document.getElementById("summaryLabel").innerHTML =
+              "<p>Click a cluster, flower point, or administrative boundary to get more information.</p>";
+          }
+        });
+
+        // Function to set the old selected feature back to its original symbol. Used when the map or a feature is clicked.
+        function resetStyles() {
+          if (selectedLayer === collectionPointLayer)
+            selection.setIcon(collectionPointIcon);
+          else if (selectedLayer === boundaryLayer)
+            selectedLayer.resetStyle(selection);
+        }
+
+        // Add the collection points GeoJSON layer using the collectionPointsData variable from collectionpoints.js
+        collectionPointLayer = new L.geoJSON(collectionPointsData, {
+          pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, { icon: collectionPointIcon });
+          },
+          onEachFeature: collectionPointOnEachFeature,
+        });
+
+        // Add the collection points layer to the map
+        collectionPointLayer.addTo(map);
+
+        // Marker Clustering Code
+        var markers = L.markerClusterGroup();
+        markers.addLayer(collectionPointLayer);
+
+        // Add the layer control with base layers and overlays
+        L.control
+          .layers(baseLayers, {
+            "Clustered Points": markers,
+            "Collection Points": collectionPointLayer,
+            "Boundaries": boundaryLayer,
+          })
+          .addTo(map);
+      }
+
+      // Function to build the HTML for the summary label using the selected feature's properties for collection points
+      function buildSummaryLabelForCollectionPoint(currentFeature) {
+        var family = currentFeature.properties.FAMILY || "Unknown Family";
+        var genus = currentFeature.properties.GENUS || "Unknown Genus";
+        var species = currentFeature.properties.SPP || "Unknown Species";
+        var date = currentFeature.properties.COLL_DT || "Unknown Date";
+
+        document.getElementById("summaryLabel").innerHTML =
+          '<p style="font-size:16px; font-family: Arial"><b>Family:</b> ' +
+          family +
+          "</p>" +
+          '<p style="font-size:16px; font-family: Arial"><b>Genus:</b> ' +
+          genus +
+          "</p>" +
+          '<p style="font-size:16px; font-family: Arial"><b>Species:</b> ' +
+          species +
+          "</p>" +
+          '<p style="font-size:16px; font-family: Arial"><b>Collection Date:</b> ' +
+          date +
+          "</p>";
+      }
+
+      // Function to build the HTML for the summary label using the selected feature's properties for boundaries
+      function buildSummaryLabelForBoundary(currentFeature) {
+        var name = currentFeature.properties.NAME || "Unknown Name";
+
+        document.getElementById("summaryLabel").innerHTML =
+          '<p style="font-size:16px; font-family: Arial"><b>Administrative Land Status:</b> ' +
+          name +
+          "</p>";
+      }
+    </script>
+  </head>
+
+  <body onload="init()">
+    <h1 id="title">Botanical Collection Points of Southern Nevada</h1>
+
+    <div id="mapid"></div>
+    <div id="summaryLabel">
+      <p>
+        Click a cluster, flower point, or administrative boundary to get more information.
+      </p>
+    </div>
+  </body>
+</html>
