@@ -1,4 +1,4 @@
-# GEOG585 Final Project: 
+# GEOG585 Final Project: Botanical Collection Points of Southern Nevada
 
 <b>Project Description: Botanical Collection Points Interactive Web Map</b><br>
 
@@ -6,23 +6,23 @@ The Botanical Collection Points Interactive Web Map is a comprehensive tool desi
 
 <b>Key Features:</b>
 
-1. Spatial Visualization: The web map offers an interactive and visually appealing representation of historical seed collection points. Each flower icon on the map signifies a specific seed collection point, and users can explore additional details about each point upon selection.
+<b>1. Spatial Visualization:</b> The web map offers an interactive and visually appealing representation of historical seed collection points. Each flower icon on the map signifies a specific seed collection point, and users can explore additional details about each point upon selection.
 
-2. Information Display: Upon selecting a flower icon, the map displays essential information about the collection point, including the plant family, scientific name, and collection date. This feature enhances the utility of the map for professionals engaged in botanical research and conservation efforts.
+<b>2. Information Display:</b> Upon selecting a flower icon, the map displays essential information about the collection point, including the plant family, scientific name, and collection date. This feature enhances the utility of the map for professionals engaged in botanical research and conservation efforts.
 
-3. Administrative Boundary Layer: The map incorporates an administrative boundary layer, providing users with spatial context and land status awareness. This information is particularly valuable for field crews, helping them navigate permit requirements and agency affiliations when identifying potential seed collection sites.
+<b>3. Administrative Boundary Layer:</b> The map incorporates an administrative boundary layer, providing users with spatial context and land status awareness. This information is particularly valuable for field crews, helping them navigate permit requirements and agency affiliations when identifying potential seed collection sites.
 
-4. Marker Clustering: To manage large datasets and provide a clear overview, the map implements a marker clustering feature. This feature dynamically visualizes spatial patterns and density clustering within the collection points, offering insights into concentration areas and distribution trends.
+<b>4. Marker Clustering:</b> To manage large datasets and provide a clear overview, the map implements a marker clustering feature. This feature dynamically visualizes spatial patterns and density clustering within the collection points, offering insights into concentration areas and distribution trends.
 
-5. Technologies Used: The interactive web map is built using HTML and leverages the Leaflet JavaScript library for mapping functionality. Additional libraries include Leaflet.markercluster for marker clustering and external CSS files for styling. GeoJSON data files, boundaries.js and collectionpoints.js, provide the spatial information for administrative boundaries and collection points, respectively.
+<b>5. Technologies Used:</b> The interactive web map is built using HTML and leverages the Leaflet JavaScript library for mapping functionality. Additional libraries include Leaflet.markercluster for marker clustering and external CSS files for styling. GeoJSON data files, boundaries.js and collectionpoints.js, provide the spatial information for administrative boundaries and collection points, respectively.
 
 <b>Main Usage:</b>
 
-1. Exploration of Collection Points: Users can explore historical seed collection points by clicking on flower icons, gaining access to detailed information about each collection, including plant taxonomy and collection date.
+<b>1. Exploration of Collection Points:</b> Users can explore historical seed collection points by clicking on flower icons, gaining access to detailed information about each collection, including plant taxonomy and collection date.
 
-2. Land Status Awareness: The administrative boundary layer aids professionals in understanding the land status within Southern Nevada, facilitating compliance with permit requirements and agency regulations.
+<b>2. Land Status Awareness:</b> The administrative boundary layer aids professionals in understanding the land status within Southern Nevada, facilitating compliance with permit requirements and agency regulations.
 
-3. Spatial Patterns and Clustering: The marker clustering feature enables dynamic visualization of spatial patterns and density clustering, offering a comprehensive overview of concentration areas and distribution trends.
+<b>3. Spatial Patterns and Clustering:</b> The marker clustering feature enables dynamic visualization of spatial patterns and density clustering, offering a comprehensive overview of concentration areas and distribution trends.
 
 In conclusion, the Botanical Collection Points Interactive Web Map serves as an invaluable tool for professionals engaged in botanical research and conservation efforts in Southern Nevada. By combining spatial visualization with detailed information and administrative context, the map contributes to informed decision-making, aiding professionals in their seed collection efforts and supporting ecological studies in the region.
 
